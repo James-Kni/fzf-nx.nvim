@@ -50,8 +50,9 @@ Install with lazy:
   list_projects_cmd = function(target)
     return "nx show projects --with-target " .. target
   end,
-  -- Run using an external terminal. E.g. "kitty -e"
-  -- When not set, the internal terminal will be used
+  -- Run using an external terminal. E.g. "kitty -e {}"
+  -- The '{}' will be replaced with the command to execute
+  -- When not set, the internal terminal will be used.
   external_term_cmd = nil
 }
 ```
