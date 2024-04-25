@@ -41,47 +41,10 @@ M.nx_run = function(target, opts)
   end
 end
 
---- Setup builtin keymaps
-local function setup_keymaps()
-  vim.keymap.set(
-    'n', '<leader>ns',
-    function()
-      M.nx_run('serve')
-    end,
-    { desc = 'Serve project' }
-  )
-
-  vim.keymap.set(
-    'n', '<leader>nt',
-    function()
-      M.nx_run('test')
-    end,
-    { desc = 'Test project' }
-  )
-
-  vim.keymap.set(
-    'n', '<leader>nl',
-    function()
-      M.nx_run('lint')
-    end,
-    { desc = 'Lint project' }
-  )
-
-  vim.keymap.set(
-    'n', '<leader>nR',
-    utils.nx_reset,
-    { desc = 'Reset' }
-  )
-end
-
 --- Setup fzf-nx plugin
 ---@param args Config?
 M.setup = function(args)
   M.config = vim.tbl_deep_extend("force", M.config, args or {})
-
-  if M.config.keymaps == true then
-    setup_keymaps()
-  end
 end
 
 return M
