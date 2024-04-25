@@ -41,12 +41,12 @@ M.nx_term = function(args)
   if config.external_term_cmd == nil then
     vim.cmd(string.format("term %s %s", config.nx_cmd, args))
   else
-    vim.fn.system(string.format(
-      "%s %s %s &",
-      config.external_term_cmd,
+    local nx_cmd = string.format(
+      "%s %s",
       config.nx_cmd,
       args
-    ))
+    )
+    vim.fn.system(config.external_term_cmd:gsub('{}', nx_cmd) .. ' &')
   end
 end
 
