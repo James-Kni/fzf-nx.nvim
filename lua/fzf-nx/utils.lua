@@ -1,8 +1,9 @@
 local M = {}
 
 --- Check if cwd is in an NX monorepo
+--- @param silent boolean? Don't show notification
 ---@return boolean
-M.is_nx_monorepo = function()
+M.is_nx_monorepo = function(silent)
   local current_dir = vim.fn.getcwd()
   local found_nx_json = false
 
@@ -24,7 +25,10 @@ M.is_nx_monorepo = function()
   if found_nx_json then
     return true
   else
-    vim.notify("Not in an NX monorepo")
+    if silent ~= true then
+      vim.notify("Not in an NX monorepo")
+    end
+
     return false
   end
 end

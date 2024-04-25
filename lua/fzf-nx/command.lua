@@ -31,6 +31,10 @@ function command.command_handler(args)
 end
 
 function command.command_complete(line)
+  if not utils.is_nx_monorepo(true) then
+    return nil
+  end
+
   local args = vim.split(line, "%s+")
   local arg_pos = #args - 2
 
