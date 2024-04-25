@@ -12,14 +12,36 @@ Install with lazy:
   "James-Kni/fzf-nx.nvim",
   dependencies = { "ibhagwan/fzf-lua" },
   opts = {},
+  -- Example keymaps
+  keys = {
+    {
+      "<leader>ns",
+      function()
+        require("fzf-nx").nx_run("serve")
+      end,
+      desc = "Serve project",
+    },
+    {
+      "<leader>nl",
+      function()
+        require("fzf-nx").nx_run("lint")
+      end,
+      desc = "Lint project",
+    },
+    {
+      "<leader>nR",
+      function()
+        require("fzf-nx.utils").nx_reset()
+      end,
+      desc = "Reset NX",
+    }
+  }
 }
 ```
 
 ## Default config 
 ```lua
 {
-  -- Use builtin keymaps
-  keymaps           = true,
   -- Command used for running NX commands
   nx_cmd            = "nx",
   -- Open browser on project serve
