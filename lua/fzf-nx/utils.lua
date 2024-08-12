@@ -4,59 +4,62 @@ local M = {}
 --- @param silent boolean? Don't show notification
 ---@return boolean
 M.is_nx_monorepo = function(silent)
-  local current_dir = vim.fn.getcwd()
-  local found_nx_json = false
+	local current_dir = vim.fn.getcwd()
+	local found_nx_json = false
 
-  repeat
-    if vim.fn.findfile('nx.json', current_dir) ~= '' then
-      found_nx_json = true
-      break
-    end
+	repeat
+		if vim.fn.findfile("nx.json", current_dir) ~= "" then
+			found_nx_json = true
+			break
+		end
 
-    local parent_dir = vim.fn.fnamemodify(current_dir, ':h')
+		local parent_dir = vim.fn.fnamemodify(current_dir, ":h")
 
-    if parent_dir == current_dir then
-      break
-    end
+		if parent_dir == current_dir then
+			break
+		end
 
-    current_dir = parent_dir
-  until false
+		current_dir = parent_dir
+	until false
 
-  if found_nx_json then
-    return true
-  else
-    if silent ~= true then
-      vim.notify("Not in an NX monorepo")
-    end
+	if found_nx_json then
+		return true
+	else
+		if silent ~= true then
+			vim.notify("Not in an NX monorepo")
+		end
 
-    return false
-  end
+		return false
+	end
 end
 
 --- Execute NX command in terminal using nx_cmd from config
 --- @param args string NX command args
 M.nx_term = function(args)
-  local config = require("fzf-nx").config
+	local config = require("fzf-nx").config
 
-  if config.external_term_cmd == nil then
-    vim.cmd(string.format("term %s %s", config.nx_cmd, args))
-  else
-    local nx_cmd = string.format(
-      "%s %s",
-      config.nx_cmd,
-      args
-    )
-    vim.fn.system(config.external_term_cmd:gsub('{}', nx_cmd) .. ' &')
-  end
+	local cmd = string.format("%s %s", config.nx_cmd, args)
+
+	if vim.g.nx_env ~= nil then
+		cmd = string.format("%s %s", vim.g.nx_env, cmd)
+	end
+
+	if config.external_term_cmd == nil then
+		vim.cmd(string.format("term %s", cmd))
+	else
+		vim.fn.system(config.external_term_cmd:gsub("{}", cmd) .. " &")
+	end
 end
 
 ---Run NX reset command
 M.nx_reset = function()
-  vim.fn.jobstart("nx reset", {
-    on_exit = function()
-      vim.notify("Reset complete!")
-    end
-  })
+	local config = require("fzf-nx").config
+
+	vim.fn.jobstart(string.format("%s reset", config.nx_cmd), {
+		on_exit = function()
+			vim.notify("Reset complete!")
+		end,
+	})
 end
 
 return M

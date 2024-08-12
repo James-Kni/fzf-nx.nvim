@@ -39,7 +39,7 @@ Install with lazy:
 }
 ```
 
-## Default config 
+## Default config
 ```lua
 {
   -- Command used for running NX commands
@@ -50,10 +50,13 @@ Install with lazy:
   list_projects_cmd = function(target)
     return "nx show projects --with-target " .. target
   end,
-  -- Run using an external terminal. E.g. "kitty -e {}"
+  -- Run using an external terminal. E.g. "kitty sh -c '{}'"
   -- The '{}' will be replaced with the command to execute
   -- When not set, the internal terminal will be used.
   external_term_cmd = nil
 }
 ```
-    
+
+## Options
+
+- `vim.g.nx_env` can be used to set environment variables to use with NX commands.
