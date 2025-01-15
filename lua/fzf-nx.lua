@@ -2,20 +2,26 @@ local M = {}
 
 local utils = require("fzf-nx.utils")
 local config = require("fzf-nx.config")
+local cache = require("fzf-nx.cache")
 
 --- @type Config
 M.config = config
 
---- Run target with fzf for selecting project
+--- Run target with picker for selection
 ---@param target string NX target E.g. serve, lint
----@param opts any? fzf options
-M.nx_run = function(target, opts)
-	local fzf = require("fzf-lua")
+M.nx_run = function(target)
+	if not utils.is_nx_monorepo() then
+		return
+	end
 
-	if utils.is_nx_monorepo() then
-		opts = opts or {}
+	local ok_fzf, fzf = pcall(require, "fzf-lua")
+	local ok_snacks, snacks = pcall(require, "snacks")
 
-		local options = {
+	local use_fzf = ok_fzf and (M.config.preferred_picker == "fzf-lua" or not ok_snacks)
+	local use_snacks = ok_snacks and (M.config.preferred_picker == "snacks" or not ok_fzf)
+
+	if use_fzf then
+		fzf.fzf_exec(M.config.list_projects_cmd(target), {
 			prompt = string.format("NX %s>", target),
 			fzf_opts = { ["--multi"] = true },
 			actions = {
@@ -38,10 +44,58 @@ M.nx_run = function(target, opts)
 					utils.nx_term(cmd)
 				end,
 			},
-		}
+		})
+	elseif use_snacks then
+		snacks.picker("nx", {
+			prompt = string.format("%s>", target),
+			layout = {
+				preset = "vscode",
+			},
+			format = "text",
+			preview = "none",
+			finder = function()
+				local projects = cache.get(target)
 
-		opts = vim.tbl_deep_extend("force", options, opts or {})
-		fzf.fzf_exec(M.config.list_projects_cmd(target), opts)
+				if not projects then
+					local result = vim.fn.system(M.config.list_projects_cmd(target))
+					projects = {}
+					for line in result:gmatch("[^\r\n]+") do
+						table.insert(projects, { text = line })
+					end
+					cache.set(target, projects)
+				end
+				return projects
+			end,
+			actions = {
+				confirm = function(picker)
+					picker:close()
+					local selected = picker:selected({ fallback = true })
+
+					local cmd = ""
+					if #selected > 1 then
+						local selected_items = {}
+						for _, item in ipairs(selected) do
+							table.insert(selected_items, item.text)
+						end
+						cmd = string.format(
+							"run-many --target=%s --projects=%s --parallel",
+							target,
+							table.concat(selected_items, ",")
+						)
+					else
+						cmd = string.format("%s %s", target, selected[1].text)
+					end
+
+					if M.config.open_on_serve and target == "serve" then
+						cmd = cmd .. " --open"
+					end
+
+					utils.nx_term(cmd)
+				end,
+			},
+		})
+	else
+		vim.notify("No supported picker available")
 	end
 end
 
@@ -49,6 +103,7 @@ end
 ---@param args Config?
 M.setup = function(args)
 	M.config = vim.tbl_deep_extend("force", M.config, args or {})
+	cache.load()
 end
 
 return M

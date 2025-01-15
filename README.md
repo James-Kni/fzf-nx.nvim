@@ -1,6 +1,6 @@
 # fzf-nx.nvim
 
-Plugin for using NX within Neovim using fzf-lua.
+Plugin for using NX within Neovim using fzf-lua or Snacks picker.
 
 
 ## Installation
@@ -10,7 +10,9 @@ Install with lazy:
 ```lua
 {
   "James-Kni/fzf-nx.nvim",
-  dependencies = { "ibhagwan/fzf-lua" },
+  dependencies = {
+    "ibhagwan/fzf-lua" -- or "folke/snacks.nvim"
+  },
   opts = {},
   -- Example keymaps
   keys = {
@@ -54,6 +56,8 @@ Install with lazy:
   -- The '{}' will be replaced with the command to execute
   -- When not set, the internal terminal will be used.
   external_term_cmd = nil
+  -- Manually select preferred picker 'fzf-lua' or 'snacks'
+  preferred_picker = "fzf-lua"
 }
 ```
 
