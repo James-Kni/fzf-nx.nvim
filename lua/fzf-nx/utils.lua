@@ -52,12 +52,16 @@ function utils.nx_term(args)
 end
 
 ---Run NX reset command
-utils.nx_reset = function()
+---@param clear_cache boolean Clear plugin cache (only snacks picker makes use of this)
+utils.nx_reset = function(clear_cache)
 	local config = require("fzf-nx").config
 
 	vim.fn.jobstart(string.format("%s reset", config.nx_cmd), {
 		on_exit = function()
-			require("fzf-nx.cache").clear()
+      if clear_cache then
+			  require("fzf-nx.cache").clear()
+      end
+
 			vim.notify("Reset complete!")
 		end,
 	})

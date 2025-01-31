@@ -53,46 +53,66 @@ M.nx_run = function(target)
 			},
 			format = "text",
 			preview = "none",
-			finder = function()
+			finder = function(opts, ctx)
+				-- Show the picker right away, nx takes decades to run
+				ctx.picker:show()
+
 				local projects = cache.get(target)
+				if #projects > 0 then
+					return projects
+				else
+					-- Oh Lord have mercy...
+					opts.on_change = function(picker)
+						local picker_items = picker:items()
 
-				if not projects then
-					local result = vim.fn.system(M.config.list_projects_cmd(target))
-					projects = {}
-					for line in result:gmatch("[^\r\n]+") do
-						table.insert(projects, { text = line })
-					end
-					cache.set(target, projects)
-				end
-				return projects
-			end,
-			actions = {
-				confirm = function(picker)
-					picker:close()
-					local selected = picker:selected({ fallback = true })
+						if #picker_items > 0 then
+							cache.set(
+								target,
+								vim.tbl_map(function(item)
+									return { text = item.text }
+								end, picker_items)
+							)
 
-					local cmd = ""
-					if #selected > 1 then
-						local selected_items = {}
-						for _, item in ipairs(selected) do
-							table.insert(selected_items, item.text)
+							-- Remove handler when done
+							opts.on_change = nil
 						end
-						cmd = string.format(
-							"run-many --target=%s --projects=%s --parallel",
-							target,
-							table.concat(selected_items, ",")
-						)
-					else
-						cmd = string.format("%s %s", target, selected[1].text)
 					end
 
-					if M.config.open_on_serve and target == "serve" then
-						cmd = cmd .. " --open"
-					end
+					return require("snacks.picker.source.proc").proc({
+						opts,
+						-- TODO: Bit weird, should probably do this properly
+						{
+							cmd = "sh",
+							args = { "-c", M.config.list_projects_cmd(target) },
+						},
+					}, ctx)
+				end
+			end,
+			confirm = function(picker)
+				picker:close()
+				local selected = picker:selected({ fallback = true })
 
-					utils.nx_term(cmd)
-				end,
-			},
+				local cmd = ""
+				if #selected > 1 then
+					local selected_items = {}
+					for _, item in ipairs(selected) do
+						table.insert(selected_items, item.text)
+					end
+					cmd = string.format(
+						"run-many --target=%s --projects=%s --parallel",
+						target,
+						table.concat(selected_items, ",")
+					)
+				else
+					cmd = string.format("%s %s", target, selected[1].text)
+				end
+
+				if M.config.open_on_serve and target == "serve" then
+					cmd = cmd .. " --open"
+				end
+
+				utils.nx_term(cmd)
+			end,
 		})
 	else
 		vim.notify("No supported picker available")

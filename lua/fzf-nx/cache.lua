@@ -1,6 +1,7 @@
 local cache = {}
 
 local cache_file = vim.fn.stdpath("cache") .. "/fzf-nx_cached_projects.json"
+---@type string[][]
 local cached_projects = {}
 
 function cache.load()
@@ -30,7 +31,7 @@ function cache.clear()
 end
 
 function cache.get(target)
-	return cached_projects[target]
+	return cached_projects[target] or {}
 end
 
 function cache.set(target, projects)
