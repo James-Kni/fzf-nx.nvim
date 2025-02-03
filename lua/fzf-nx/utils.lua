@@ -1,9 +1,9 @@
-local M = {}
+local utils = {}
 
 --- Check if cwd is in an NX monorepo
 --- @param silent boolean? Don't show notification
 ---@return boolean
-M.is_nx_monorepo = function(silent)
+function utils.is_nx_monorepo(silent)
 	local current_dir = vim.fn.getcwd()
 	local found_nx_json = false
 
@@ -35,7 +35,7 @@ end
 
 --- Execute NX command in terminal using nx_cmd from config
 --- @param args string NX command args
-M.nx_term = function(args)
+function utils.nx_term(args)
 	local config = require("fzf-nx").config
 
 	local cmd = string.format("%s %s", config.nx_cmd, args)
@@ -52,14 +52,19 @@ M.nx_term = function(args)
 end
 
 ---Run NX reset command
-M.nx_reset = function()
+---@param clear_cache boolean Clear plugin cache (only snacks picker makes use of this)
+utils.nx_reset = function(clear_cache)
 	local config = require("fzf-nx").config
 
 	vim.fn.jobstart(string.format("%s reset", config.nx_cmd), {
 		on_exit = function()
+      if clear_cache then
+			  require("fzf-nx.cache").clear()
+      end
+
 			vim.notify("Reset complete!")
 		end,
 	})
 end
 
-return M
+return utils
