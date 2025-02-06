@@ -61,8 +61,7 @@ M.nx_run = function(target)
 				if #projects > 0 then
 					return projects
 				else
-					-- Oh Lord have mercy...
-					opts.on_change = function(picker)
+					opts.on_close = function(picker)
 						local picker_items = picker:items()
 
 						if #picker_items > 0 then
@@ -72,9 +71,6 @@ M.nx_run = function(target)
 									return { text = item.text }
 								end, picker_items)
 							)
-
-							-- Remove handler when done
-							opts.on_change = nil
 						end
 					end
 
