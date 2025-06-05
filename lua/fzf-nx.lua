@@ -62,7 +62,7 @@ M.nx_run = function(target)
 					return projects
 				else
 					opts.on_close = function(picker)
-						local picker_items = picker:items()
+						local picker_items = picker.finder.items
 
 						if #picker_items > 0 then
 							cache.set(
