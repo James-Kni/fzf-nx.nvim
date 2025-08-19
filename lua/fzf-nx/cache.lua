@@ -1,7 +1,8 @@
 local cache = {}
 
 local cache_file = vim.fn.stdpath("cache") .. "/fzf-nx_cached_projects.json"
----@type string[][]
+---@alias CacheItem { text: string }
+---@type table<string, CacheItem[]>
 local cached_projects = {}
 
 function cache.load()
