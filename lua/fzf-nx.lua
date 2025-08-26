@@ -24,6 +24,11 @@ M.nx_run = function(target)
 		fzf.fzf_exec(M.config.list_projects_cmd(target), {
 			prompt = string.format("NX %s>", target),
 			fzf_opts = { ["--multi"] = true },
+      winopts = {
+        row = 0,
+        width = 0.4,
+        height = 0.4,
+      },
 			actions = {
 				["default"] = function(selected)
 					local cmd = ""
