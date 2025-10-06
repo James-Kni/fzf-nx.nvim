@@ -18,7 +18,7 @@ function cache.load()
 end
 
 function cache.save()
-	local ok, content = pcall(vim.json.encode, cached_projects, { indent = true })
+	local ok, content = pcall(vim.json.encode, cached_projects)
 	if not ok then
 		vim.notify("Failed to save NX project cache: encoding error", vim.log.levels.WARN)
 	else
