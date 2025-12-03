@@ -24,11 +24,11 @@ M.nx_run = function(target)
 		fzf.fzf_exec(M.config.list_projects_cmd(target), {
 			prompt = string.format("NX %s>", target),
 			fzf_opts = { ["--multi"] = true },
-      winopts = {
-        row = 0,
-        width = 0.4,
-        height = 0.4,
-      },
+			winopts = {
+				row = 0,
+				width = 0.4,
+				height = 0.4,
+			},
 			actions = {
 				["default"] = function(selected)
 					local cmd = ""
@@ -79,14 +79,13 @@ M.nx_run = function(target)
 						end
 					end
 
-					return require("snacks.picker.source.proc").proc({
-						opts,
-						-- TODO: Bit weird, should probably do this properly
-						{
+					return require("snacks.picker.source.proc").proc(
+						ctx:opts({
 							cmd = "sh",
 							args = { "-c", M.config.list_projects_cmd(target) },
-						},
-					}, ctx)
+						}),
+						ctx
+					)
 				end
 			end,
 			confirm = function(picker)
