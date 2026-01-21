@@ -47,7 +47,12 @@ function utils.nx_term(args)
 	if config.external_term_cmd == nil then
 		vim.cmd(string.format("term %s", cmd))
 	else
-		vim.fn.system(config.external_term_cmd:gsub("{}", cmd) .. " &")
+		if type(config.external_term_cmd) == "function" then
+			cmd = config.external_term_cmd(cmd)
+		else
+			cmd = config.external_term_cmd:gsub("{}", cmd)
+		end
+		vim.fn.system(cmd .. " &")
 	end
 end
 
@@ -58,9 +63,9 @@ utils.nx_reset = function(clear_cache)
 
 	vim.fn.jobstart(string.format("%s reset", config.nx_cmd), {
 		on_exit = function()
-      if clear_cache then
-			  require("fzf-nx.cache").clear()
-      end
+			if clear_cache then
+				require("fzf-nx.cache").clear()
+			end
 
 			vim.notify("Reset complete!")
 		end,

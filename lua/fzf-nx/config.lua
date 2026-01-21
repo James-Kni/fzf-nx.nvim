@@ -4,7 +4,10 @@ local config = {}
 ---@field nx_cmd string Command to use for executing actions
 ---@field list_projects_cmd function Generates a command string to list projects based on the provided target.
 ---@field open_on_serve boolean Open browser when serving project
----@field external_term_cmd string | nil Open an external terminal instead of using the internal term. E.g. 'kitty -e {}'
+---Open an external terminal instead of using the internal term.
+---String uses '{}' as placeholder (e.g. 'kitty -e {}'),
+---function receives cmd and returns the full command string.
+---@field external_term_cmd string | nil | fun(cmd: string): string
 ---@field preferred_picker 'fzf-lua' | 'snacks' Select preferred picker
 config = {
   nx_cmd            = "nx",
