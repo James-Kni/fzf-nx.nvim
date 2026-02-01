@@ -57,7 +57,7 @@ function utils.nx_term(args)
 end
 
 ---Run NX reset command
----@param clear_cache boolean Clear plugin cache (only snacks picker makes use of this)
+---@param clear_cache boolean Clear plugin cache
 utils.nx_reset = function(clear_cache)
 	local config = require("fzf-nx").config
 

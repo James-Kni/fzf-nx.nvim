@@ -21,7 +21,7 @@ M.nx_run = function(target)
 	local use_snacks = ok_snacks and (M.config.preferred_picker == "snacks" or not ok_fzf)
 
 	if use_fzf then
-		fzf.fzf_exec(M.config.list_projects_cmd(target), {
+		local fzf_opts = {
 			prompt = string.format("NX %s>", target),
 			fzf_opts = { ["--multi"] = true },
 			winopts = {
@@ -49,7 +49,45 @@ M.nx_run = function(target)
 					utils.nx_term(cmd)
 				end,
 			},
-		})
+		}
+
+		local cached = cache.get(target)
+		if #cached > 0 then
+			local items = vim.tbl_map(function(item)
+				return item.text
+			end, cached)
+			fzf.fzf_exec(items, fzf_opts)
+		else
+			fzf.fzf_exec(function(fzf_cb)
+				local results = {}
+				local job_id = vim.fn.jobstart(M.config.list_projects_cmd(target), {
+					stdout_buffered = true,
+					on_stdout = function(_, data)
+						for _, line in ipairs(data) do
+							if line and line ~= "" then
+								table.insert(results, line)
+								fzf_cb(line)
+							end
+						end
+					end,
+					on_exit = function()
+						fzf_cb()
+						if #results > 0 then
+							cache.set(
+								target,
+								vim.tbl_map(function(t)
+									return { text = t }
+								end, results)
+							)
+						end
+					end,
+				})
+				if job_id <= 0 then
+					vim.notify("Failed to run NX command", vim.log.levels.ERROR)
+					fzf_cb()
+				end
+			end, fzf_opts)
+		end
 	elseif use_snacks then
 		snacks.picker("nx", {
 			prompt = string.format("%s>", target),
