@@ -46,8 +46,6 @@ Install with lazy:
 {
   -- Command used for running NX commands
   nx_cmd            = "nx",
-  -- Open browser on project serve
-  open_on_serve     = false,
   -- Command used for getting a list of NX projects
   list_projects_cmd = function(target)
     return "nx show projects --with-target " .. target

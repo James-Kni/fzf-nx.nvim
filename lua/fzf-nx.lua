@@ -42,10 +42,6 @@ M.nx_run = function(target)
 						cmd = string.format("%s %s", target, selected[1])
 					end
 
-					if M.config.open_on_serve and target == "serve" then
-						cmd = cmd .. " --open"
-					end
-
 					utils.nx_term(cmd)
 				end,
 			},
@@ -143,10 +139,6 @@ M.nx_run = function(target)
 					)
 				else
 					cmd = string.format("%s %s", target, selected[1].text)
-				end
-
-				if M.config.open_on_serve and target == "serve" then
-					cmd = cmd .. " --open"
 				end
 
 				utils.nx_term(cmd)
