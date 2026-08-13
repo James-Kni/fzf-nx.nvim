@@ -42,7 +42,7 @@ M.nx_run = function(target)
 						cmd = string.format("%s %s", target, selected[1])
 					end
 
-					utils.nx_term(cmd)
+					utils.nx_term(cmd, { target = target, projects = selected })
 				end,
 			},
 		}
@@ -126,22 +126,22 @@ M.nx_run = function(target)
 				picker:close()
 				local selected = picker:selected({ fallback = true })
 
+				local projects = vim.tbl_map(function(item)
+					return item.text
+				end, selected)
+
 				local cmd = ""
-				if #selected > 1 then
-					local selected_items = {}
-					for _, item in ipairs(selected) do
-						table.insert(selected_items, item.text)
-					end
+				if #projects > 1 then
 					cmd = string.format(
 						"run-many --target=%s --projects=%s --parallel",
 						target,
-						table.concat(selected_items, ",")
+						table.concat(projects, ",")
 					)
 				else
-					cmd = string.format("%s %s", target, selected[1].text)
+					cmd = string.format("%s %s", target, projects[1])
 				end
 
-				utils.nx_term(cmd)
+				utils.nx_term(cmd, { target = target, projects = projects })
 			end,
 		})
 	else

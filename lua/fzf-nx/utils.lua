@@ -35,13 +35,22 @@ end
 
 --- Execute NX command in terminal using nx_cmd from config
 --- @param args string NX command args
-function utils.nx_term(args)
+--- @param ctx { target?: string, projects?: string[], cwd?: string }? Picker context; missing fields get defaults
+function utils.nx_term(args, ctx)
 	local config = require("fzf-nx").config
 
 	local cmd = string.format("%s %s", config.nx_cmd, args)
 
 	if vim.g.nx_env ~= nil then
 		cmd = string.format("%s %s", vim.g.nx_env, cmd)
+	end
+
+	if type(config.term_handler) == "function" then
+		ctx = vim.tbl_extend("keep", ctx or {}, { projects = {}, cwd = vim.fn.getcwd() })
+
+		if config.term_handler(cmd, ctx) ~= false then
+			return
+		end
 	end
 
 	if config.external_term_cmd == nil then
